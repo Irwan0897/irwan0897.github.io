@@ -122,7 +122,29 @@
         const ADMIN_CONTACT_WA = "https://wa.me/6285368859576";
         const ADMIN_CONTACT_FB = "https://www.facebook.com/chek.bdul";
         const ADMIN_CONTACT_TG = "https://t.me/apksett";
-        const APP_ACCESS_LINK = "https://payment-landaiporject.netlify.app/";
+        const APP_ACCESS_LINK = "https://landaipoject.github.io/Paymentt/";
+
+        // Affiliate System
+        const getAffiliateId = () => {
+            // Check URL parameters first
+            const urlParams = new URLSearchParams(window.location.search);
+            const refParam = urlParams.get('ref') || urlParams.get('aff') || urlParams.get('affiliate');
+
+            if (refParam) {
+                localStorage.setItem('viralizer_affiliate_id', refParam);
+                return refParam;
+            }
+
+            // Check localStorage
+            return localStorage.getItem('viralizer_affiliate_id');
+        };
+
+        const getAffiliateLink = (baseUrl, affiliateId) => {
+            if (!affiliateId) return baseUrl;
+            const url = new URL(baseUrl);
+            url.searchParams.set('ref', affiliateId);
+            return url.toString();
+        };
 
         // Icon Components
         const MenuIcon = (props) => (
@@ -480,7 +502,7 @@
                                     <a href={ADMIN_CONTACT_WA} target="_blank" rel="noopener noreferrer" className="text-xs sm:text-sm font-medium text-slate-300 hover:text-purple-400 transition-colors px-2 py-1 rounded">
                                         Admin
                                     </a>
-                                    <a href={APP_ACCESS_LINK} target="_blank" rel="noopener noreferrer" className="inline-block px-3 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg shadow-lg hover:shadow-purple-500/40 hover:from-purple-700 hover:to-indigo-700 transform hover:-translate-y-0.5 transition-all duration-300">
+                                    <a href={getAffiliateLink(APP_ACCESS_LINK, getAffiliateId())} target="_blank" rel="noopener noreferrer" className="inline-block px-3 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg shadow-lg hover:shadow-purple-500/40 hover:from-purple-700 hover:to-indigo-700 transform hover:-translate-y-0.5 transition-all duration-300">
                                         Akses Aplikasi
                                     </a>
                                 </div>
@@ -817,7 +839,7 @@
                                             <span className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-cyan-400">Rp 99.000</span>
                                         </div>
 
-                                        <a href="https://lynk.id/landaiproject/jz748xm7r4l8" target="_blank" rel="noopener noreferrer" className="inline-block w-full sm:w-auto px-6 sm:px-8 py-3 text-sm sm:text-base font-semibold text-white bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 rounded-lg shadow-lg shadow-green-500/40 transform hover:-translate-y-0.5 transition-all duration-300">
+                                        <a href={getAffiliateLink("https://lynk.id/landaiproject/jz748xm7r4l8", getAffiliateId())} target="_blank" rel="noopener noreferrer" className="inline-block w-full sm:w-auto px-6 sm:px-8 py-3 text-sm sm:text-base font-semibold text-white bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 rounded-lg shadow-lg shadow-green-500/40 transform hover:-translate-y-0.5 transition-all duration-300">
                                             Klaim Diskon Sekarang
                                         </a>
                                         <p className="text-xs text-slate-500 mt-3 sm:mt-4 px-2">Anda akan diarahkan ke WhatsApp Admin untuk aktivasi.</p>
@@ -834,7 +856,7 @@
                                         <p className="max-w-xl mx-auto text-slate-400 mb-8">
                                             Akses tool lengkapnya sekarang juga. Untuk pelanggan setia dan pengguna yang ingin upgrade, klik tombol di bawah.
                                         </p>
-                                        <GradientButton href={APP_ACCESS_LINK} className="!bg-pink-600 hover:!bg-pink-700 !from-pink-600 !to-rose-600 hover:!from-pink-700 hover:!to-rose-700 !shadow-pink-500/40">
+                                        <GradientButton href={getAffiliateLink(APP_ACCESS_LINK, getAffiliateId())} className="!bg-pink-600 hover:!bg-pink-700 !from-pink-600 !to-rose-600 hover:!from-pink-700 hover:!to-rose-700 !shadow-pink-500/40">
                                             Akses Versi Lengkap
                                         </GradientButton>
                                     </div>
@@ -923,6 +945,77 @@
                                 </div>
                             </section>
 
+                            {/* Affiliate Section */}
+                            <section className="py-12 sm:py-20 px-4 sm:px-6 bg-[#111827]/30">
+                                <div className="container mx-auto text-center max-w-4xl scroll-animate">
+                                    <h2 className="text-2xl sm:text-3xl font-bold text-slate-100 mb-4">Bergabung Jadi Affiliate Viralizer AI</h2>
+                                    <p className="text-sm sm:text-base text-slate-400 mb-8 px-4">
+                                        Dapatkan komisi 30% dari setiap penjualan yang Anda referensikan. Bagikan link affiliate Anda dan mulai dapatkan passive income!
+                                    </p>
+
+                                    {/* Affiliate Registration Form */}
+                                    <div className="bg-slate-800/60 p-6 sm:p-8 rounded-2xl border border-slate-700/50 mb-8">
+                                        <h3 className="text-lg sm:text-xl font-bold text-slate-100 mb-4">Daftar Jadi Affiliate</h3>
+                                        <div className="space-y-4 mb-6">
+                                            <div>
+                                                <label htmlFor="affiliate-name" className="block text-sm font-medium text-slate-300 mb-2">Nama Lengkap</label>
+                                                <input
+                                                    type="text"
+                                                    id="affiliate-name"
+                                                    placeholder="Masukkan nama lengkap Anda"
+                                                    className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:border-purple-500"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label htmlFor="affiliate-wa" className="block text-sm font-medium text-slate-300 mb-2">Nomor WhatsApp</label>
+                                                <input
+                                                    type="tel"
+                                                    id="affiliate-wa"
+                                                    placeholder="Contoh: 6281234567890"
+                                                    className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:border-purple-500"
+                                                />
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={() => {
+                                                const name = document.getElementById('affiliate-name').value.trim();
+                                                const wa = document.getElementById('affiliate-wa').value.trim();
+
+                                                if (!name || !wa) {
+                                                    alert('Mohon isi nama dan nomor WhatsApp Anda.');
+                                                    return;
+                                                }
+
+                                                const message = `Halo Admin, saya ingin mendaftar sebagai affiliate Viralizer AI.%0ANama: ${encodeURIComponent(name)}%0AWhatsApp: ${encodeURIComponent(wa)}%0AMohon berikan ID affiliate saya.`;
+                                                window.open(`https://wa.me/6285368859576?text=${message}`, '_blank');
+                                            }}
+                                            className="w-full px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-all duration-300"
+                                        >
+                                            <WhatsAppIcon className="w-5 h-5 inline mr-2" /> Daftar Sekarang
+                                        </button>
+                                        <p className="text-xs text-slate-500 mt-4">
+                                            Admin akan memberikan ID affiliate unik Anda setelah verifikasi.
+                                        </p>
+                                    </div>
+
+
+                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+                                        <div className="bg-slate-800/60 p-6 rounded-xl border border-slate-700/50">
+                                            <div className="text-2xl font-bold text-green-400 mb-2">30%</div>
+                                            <div className="text-sm text-slate-400">Komisi per Penjualan</div>
+                                        </div>
+                                        <div className="bg-slate-800/60 p-6 rounded-xl border border-slate-700/50">
+                                            <div className="text-2xl font-bold text-blue-400 mb-2">Rp 29.700</div>
+                                            <div className="text-sm text-slate-400">Komisi per Sale</div>
+                                        </div>
+                                        <div className="bg-slate-800/60 p-6 rounded-xl border border-slate-700/50">
+                                            <div className="text-2xl font-bold text-purple-400 mb-2">∞</div>
+                                            <div className="text-sm text-slate-400">Pembayaran Unlimited</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
                             {/* Contact Section */}
                             <section className="py-12 sm:py-20 px-4 sm:px-6">
                                 <div className="container mx-auto text-center max-w-2xl scroll-animate">
@@ -1003,8 +1096,8 @@
                                 <SparklesIcon className="w-16 h-16 mb-4 text-slate-700" />
                                 <h2 className="text-xl font-semibold text-slate-400">Viralizer AI</h2>
                                 <p className="mb-4">Aplikasi sedang dalam mode maintenance.</p>
-                                <a 
-                                    href={APP_ACCESS_LINK}
+                                <a
+                                    href={getAffiliateLink(APP_ACCESS_LINK, getAffiliateId())}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="inline-block px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg shadow-lg hover:shadow-purple-500/40 hover:from-purple-700 hover:to-indigo-700 transform hover:-translate-y-0.5 transition-all duration-300"
