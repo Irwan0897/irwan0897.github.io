@@ -312,32 +312,7 @@
 
         // Maintenance Component
         const Maintenance = () => {
-            const getInitialTimeLeft = () => {
-                try {
-                    const endTime = localStorage.getItem('viralizer_countdown_end');
-                    if (endTime) {
-                        const remaining = Math.round((parseInt(endTime, 10) - Date.now()) / 1000);
-                        if (remaining > 0) {
-                            return remaining;
-                        } else {
-                            // Jika waktu sudah habis, reset countdown
-                            localStorage.removeItem('viralizer_countdown_end');
-                            const newEndTime = Date.now() + 8 * 60 * 1000; // 8 minutes from now
-                            localStorage.setItem('viralizer_countdown_end', String(newEndTime));
-                            return 8 * 60;
-                        }
-                    }
-                    // Jika belum ada countdown, buat yang baru
-                    const newEndTime = Date.now() + 8 * 60 * 1000; // 8 minutes from now
-                    localStorage.setItem('viralizer_countdown_end', String(newEndTime));
-                    return 8 * 60;
-                } catch (error) {
-                    console.log('localStorage error, using fallback timer');
-                    return 8 * 60; // Fallback jika localStorage tidak tersedia
-                }
-            };
-
-            const [timeLeft, setTimeLeft] = useState(getInitialTimeLeft);
+            const [timeLeft, setTimeLeft] = useState(0);
             const [currentTestimonialIndex, setCurrentTestimonialIndex] = useState(0);
 
             const testimonials = [
@@ -407,41 +382,87 @@
                 }
             ];
 
-            // Countdown Timer Logic
+            // Countdown Timer Logic - Same as Paymentt/index.html
             useEffect(() => {
-                if (timeLeft <= 0) {
-                    // Jika waktu habis, hapus localStorage untuk reset
-                    localStorage.removeItem('viralizer_countdown_end');
-                    return;
-                }
-                
-                const timerId = setInterval(() => {
-                    setTimeLeft((prevTime) => {
-                        const newTime = prevTime > 0 ? prevTime - 1 : 0;
-                        
-                        // Update localStorage setiap detik untuk sinkronisasi
-                        if (newTime > 0) {
-                            const newEndTime = Date.now() + (newTime * 1000);
-                            try {
-                                localStorage.setItem('viralizer_countdown_end', String(newEndTime));
-                            } catch (error) {
-                                console.log('localStorage update failed');
-                            }
-                        } else {
-                            // Jika waktu habis, hapus dari localStorage
-                            try {
-                                localStorage.removeItem('viralizer_countdown_end');
-                            } catch (error) {
-                                console.log('localStorage cleanup failed');
-                            }
+                const countdownEl = document.getElementById('countdown-timer-maintenance');
+                if (!countdownEl) return;
+
+                // Durasi baru: 9 menit dalam detik (540 detik)
+                const newDuration = 540;
+                let timerInterval; // Menyimpan ID interval
+
+                function startTimer() {
+                    let endTime;
+                    const storedEndTime = localStorage.getItem('viralizer_countdown_end');
+
+                    if (storedEndTime) {
+                        endTime = parseInt(storedEndTime, 10);
+                        // Jika waktu tersimpan sudah habis, atau kurang dari 1 detik (untuk menghindari bug), reset timer
+                        if (endTime < Date.now() + 1000) {
+                            resetTimer(); // Panggil reset untuk langsung memulai hitungan baru
+                            return;
                         }
-                        
-                        return newTime;
-                    });
-                }, 1000);
-                
-                return () => clearInterval(timerId);
-            }, [timeLeft]);
+                    } else {
+                        // Atur timer baru (9 menit dari sekarang)
+                        endTime = Date.now() + newDuration * 1000;
+                        localStorage.setItem('viralizer_countdown_end', endTime);
+                    }
+
+                    // Hapus interval sebelumnya jika ada
+                    if (timerInterval) {
+                        clearInterval(timerInterval);
+                    }
+
+                    timerInterval = setInterval(updateTimer, 1000);
+
+                    function updateTimer() {
+                        const remaining = Math.round((endTime - Date.now()) / 1000);
+
+                        if (remaining <= 0) {
+                            resetTimer(); // Otomatis reset saat mencapai nol
+                            return;
+                        }
+
+                        const minutes = Math.floor(remaining / 60);
+                        const seconds = remaining % 60;
+
+                        const displayMinutes = String(minutes).padStart(2, '0');
+                        const displaySeconds = String(seconds).padStart(2, '0');
+
+                        countdownEl.textContent = `${displayMinutes}:${displaySeconds}`;
+
+                        // Ubah tampilan untuk urgensi
+                        if (remaining < 60) {
+                            countdownEl.classList.add('text-red-400', 'animate-pulse');
+                            countdownEl.classList.remove('text-white');
+                        } else {
+                            countdownEl.classList.remove('text-red-400', 'animate-pulse');
+                            countdownEl.classList.add('text-white');
+                        }
+                    }
+                    updateTimer(); // Panggilan awal untuk menampilkan waktu segera
+                }
+
+                function resetTimer() {
+                    if (timerInterval) {
+                        clearInterval(timerInterval);
+                    }
+
+                    // Atur tampilan ke 00:00 (sebelum memulai yang baru)
+                    countdownEl.textContent = '00:00';
+                    countdownEl.classList.add('text-red-400');
+                    countdownEl.classList.remove('animate-pulse', 'text-white');
+
+                    // Hapus item dari localStorage dan panggil startTimer() untuk hitungan baru
+                    localStorage.removeItem('viralizer_countdown_end');
+
+                    // Hitungan baru dimulai otomatis
+                    startTimer();
+                }
+
+                // Mulai timer
+                startTimer();
+            }, []);
 
             // Testimonial Cycling Logic
             useEffect(() => {
@@ -826,8 +847,8 @@
 
                                         <div className="my-4 sm:my-6">
                                             <p className="text-xs sm:text-sm text-yellow-300 uppercase tracking-widest">Penawaran Berakhir Dalam</p>
-                                            <div className={`text-3xl sm:text-4xl md:text-5xl font-mono font-bold tracking-widest bg-black/30 rounded-lg inline-block px-3 sm:px-4 py-1 sm:py-2 mt-2 border-2 transition-colors ${timeLeft > 60 ? 'text-white border-slate-700' : 'text-red-400 border-red-500/50 animate-pulse'}`}>
-                                                {formatTime(timeLeft)}
+                                            <div id="countdown-timer-maintenance" className="text-3xl sm:text-4xl md:text-5xl font-mono font-extrabold tracking-widest bg-black/30 rounded-lg inline-block px-3 sm:px-4 py-1 sm:py-2 mt-2 border-2 border-slate-600 text-white animate-pulse">
+                                                00:00
                                             </div>
                                         </div>
 
